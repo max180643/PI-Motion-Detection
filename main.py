@@ -5,6 +5,7 @@ from picamera.array import PiRGBArray
 from threading import Thread
 import numpy as np
 from PIL import Image
+import requests
 
 # Camera Settings
 CAMERA_WIDTH = 800
@@ -17,6 +18,13 @@ CAMERA_FRAMERATE = 15
 threshold = 10   # How Much a pixel has to change (1 - 254)
 sensitivity = 350000  # How Many pixels need to change for motion detection
 delaytime = 5  # delay time when motion detect (Second)
+
+# Line Notify Settings
+url = "https://notify-api.line.me/api/notify"
+token = ''  # Line Notify Token
+img = {'imageFile': open('motion.jpeg', 'rb')}
+headers = {'Authorization': 'Bearer ' + token}
+alertMSG = "ตรวจพบการเคลื่อนไหว"  # Alert Message
 
 
 class PiVideoStream:
@@ -91,6 +99,13 @@ def checkForMotion(data1, data2):
     return motionDetected
 
 
+def sendNotify():
+    data = {'message': alertMSG}
+    session = requests.Session()
+    session_post = session.post(url, headers=headers, files=img, data=data)
+    showMessage("Notify", session_post.text)
+
+
 def Main():
     msgStr = "Checking for Motion"
     showMessage("Main", msgStr)
@@ -101,6 +116,7 @@ def Main():
         if checkForMotion(frame_1, frame_2):
             im = Image.fromarray(frame_1)
             im.save("motion.jpeg")
+            sendNotify()
             time.sleep(delaytime)  # sleep when detected
             frame_1 = vs.read()  # reset image when detected
         else:
