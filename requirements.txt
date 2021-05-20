@@ -1,0 +1,4 @@
+numpy==1.20.3
+picamera==1.13
+Pillow==8.2.0
+pkg-resources==0.0.0
