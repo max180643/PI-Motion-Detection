@@ -8,6 +8,7 @@
 - [numpy](https://pypi.org/project/numpy/)
 - [Pillow](https://pypi.org/project/Pillow/)
 - [requests](https://pypi.org/project/requests/)
+- [opencv](https://pypi.org/project/opencv-python/)
 
 ## Installation (วิธีการติดตั้ง)
 
@@ -16,6 +17,11 @@
 - Python 3.5 or later installed.
 - pip3 installed.
 - LINE Notify Token.
+
+### Dependencies (opencv)
+- `sudo apt-get install libilmbase-dev`
+- `sudo apt-get install libopenexr-dev`
+- `sudo apt-get install libgstreamer1.0-dev`
 
 ### Run (ขั้นตอนการติดตั้ง)
 
