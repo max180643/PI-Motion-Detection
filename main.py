@@ -9,6 +9,8 @@ from PIL import Image
 import requests
 import cv2
 
+filename = "motion.jpg"
+
 # Camera Settings
 CAMERA_WIDTH = 800
 CAMERA_HEIGHT = 600
@@ -24,7 +26,6 @@ delaytime = 5  # delay time when motion detect (Second)
 # Line Notify Settings
 url = "https://notify-api.line.me/api/notify"
 token = ''  # Line Notify Token
-img = {'imageFile': open('motion.jpeg', 'rb')}
 headers = {'Authorization': 'Bearer ' + token}
 alertMSG = "ตรวจพบการเคลื่อนไหว"  # Alert Message
 
@@ -34,6 +35,8 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 fontscale = 0.8
 color = (255, 255, 255)
 thickness = 2
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+face_color = (0, 255, 0)
 
 
 class PiVideoStream:
@@ -110,8 +113,10 @@ def checkForMotion(data1, data2):
 
 def sendNotify():
     data = {'message': alertMSG}
+    lineImage = {'imageFile': open(filename, 'rb')}
     session = requests.Session()
-    session_post = session.post(url, headers=headers, files=img, data=data)
+    session_post = session.post(
+        url, headers=headers, files=lineImage, data=data)
     showMessage("Notify", session_post.text)
 
 
@@ -119,6 +124,27 @@ def getTime():
     now = datetime.datetime.now()
     now = now.strftime("%Y-%m-%d %H:%M:%S %p")
     return now
+
+
+def saveArrayToImage(data):
+    im = Image.fromarray(data)
+    im.save(filename)
+
+
+def addTextAndFaceDetection():
+    # load image
+    img = cv2.imread(filename)
+    # face detection
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray)
+    # Draw rectangle around the faces
+    for (x, y, w, h) in faces:
+        cv2.rectangle(img, (x, y), (x + w, y + h), face_color, thickness)
+    # add text to image
+    cv2.putText(img, getTime(), coordinates,
+                font, fontscale, color, thickness)
+    # save image
+    cv2.imwrite(filename, img)
 
 
 def Main():
@@ -130,14 +156,9 @@ def Main():
         frame_2 = vs.read()
         if checkForMotion(frame_1, frame_2):
             # array to image
-            im = Image.fromarray(frame_1)
-            im.save("motion.jpeg")
-            # add text to image
-            img = cv2.imread("motion.jpeg")
-            cv2.putText(img, getTime(), coordinates,
-                        font, fontscale, color, thickness)
-            cv2.imwrite("motion.jpeg", img)
-            # sendNotify()
+            saveArrayToImage(frame_1)
+            addTextAndFaceDetection()
+            sendNotify()
             time.sleep(delaytime)  # sleep when detected
             frame_1 = vs.read()  # reset image when detected
         else:
