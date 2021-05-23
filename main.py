@@ -1,11 +1,13 @@
 # Import Libraries
 import time
+import datetime
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 from threading import Thread
 import numpy as np
 from PIL import Image
 import requests
+import cv2
 
 # Camera Settings
 CAMERA_WIDTH = 800
@@ -25,6 +27,13 @@ token = ''  # Line Notify Token
 img = {'imageFile': open('motion.jpeg', 'rb')}
 headers = {'Authorization': 'Bearer ' + token}
 alertMSG = "ตรวจพบการเคลื่อนไหว"  # Alert Message
+
+# opencv setting
+coordinates = (30, 50)
+font = cv2.FONT_HERSHEY_SIMPLEX
+fontscale = 0.8
+color = (255, 255, 255)
+thickness = 2
 
 
 class PiVideoStream:
@@ -106,6 +115,12 @@ def sendNotify():
     showMessage("Notify", session_post.text)
 
 
+def getTime():
+    now = datetime.datetime.now()
+    now = now.strftime("%Y-%m-%d %H:%M:%S %p")
+    return now
+
+
 def Main():
     msgStr = "Checking for Motion"
     showMessage("Main", msgStr)
@@ -114,9 +129,15 @@ def Main():
     while True:
         frame_2 = vs.read()
         if checkForMotion(frame_1, frame_2):
+            # array to image
             im = Image.fromarray(frame_1)
             im.save("motion.jpeg")
-            sendNotify()
+            # add text to image
+            img = cv2.imread("motion.jpeg")
+            cv2.putText(img, getTime(), coordinates,
+                        font, fontscale, color, thickness)
+            cv2.imwrite("motion.jpeg", img)
+            # sendNotify()
             time.sleep(delaytime)  # sleep when detected
             frame_1 = vs.read()  # reset image when detected
         else:
