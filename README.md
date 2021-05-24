@@ -1,6 +1,6 @@
 # PI Motion Detection
 
-เมื่อกล้องตรวจพบการเคลื่อนไหวหรือการเปลื่ยนแปลงในภาพ จะทำการแจ้งเตือนไปยังผู้ใช้งานผ่าน LINE Notify เป็นข้อความและรูปภาพ
+เมื่อกล้องตรวจพบการเคลื่อนไหวหรือการเปลื่ยนแปลงในภาพ จะทำการแจ้งเตือนไปยังผู้ใช้งานผ่าน LINE Notify เป็นข้อความและรูปภาพพร้อมกับการทำ Face Detection
 
 ### Libraries
 
@@ -19,6 +19,7 @@
 - LINE Notify Token.
 
 ### Dependencies (opencv)
+
 - `sudo apt-get install libilmbase-dev`
 - `sudo apt-get install libopenexr-dev`
 - `sudo apt-get install libgstreamer1.0-dev`
@@ -35,6 +36,8 @@
 #### References (อ้างอิง)
 
 - [pageauc/pi-motion-lite](https://github.com/pageauc/pi-motion-lite)
+- [Line Notify](https://iot.jpnet.co.th/python-line-local-file/)
+- [Face Detection](https://towardsdatascience.com/face-detection-in-2-minutes-using-opencv-python-90f89d7c0f81)
 
 ---
 
